@@ -2363,7 +2363,11 @@ instance ToJSON Interval where
   toJSON Minute  = "minute"
   toJSON Second  = "second"
 
+#if !MIN_VERSION_base(4,12,0)
 parseStringInterval :: (Monad m) => String -> m NominalDiffTime
+#else
+parseStringInterval :: (MonadFail m) => String -> m NominalDiffTime
+#endif
 parseStringInterval s = case span isNumber s of
   ("", _) -> fail "Invalid interval"
   (nS, unitS) -> case (readMay nS, readMay unitS) of
