@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP                        #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE RecordWildCards            #-}
@@ -1620,7 +1621,12 @@ functionScoreFunctionsPair (FunctionScoreSingle fn)
 functionScoreFunctionsPair (FunctionScoreMultiple componentFns) =
   ("functions", toJSON componentFns)
 
+
+#if !MIN_VERSION_base(4,12,0)
 fieldTagged :: Monad m => (FieldName -> Object -> m a) -> Object -> m a
+#else
+fieldTagged :: MonadFail m => (FieldName -> Object -> m a) -> Object -> m a
+#endif
 fieldTagged f o = case HM.toList o of
                     [(k, Object o')] -> f (FieldName k) o'
                     _ -> fail "Expected object with 1 field-named key"
